@@ -3,7 +3,9 @@ import Toast from './toast.vue'
 let plugin = {};
 
 // 插件必须有一个install方法
+// options 全局的配置项
 plugin.install = function( Vue, options = {} ){
+    // 继承Toast组件中的所有方法
     const ToastController = Vue.extend( Toast );
     // 关闭方法
     ToastController.prototype.close = function( body ){
@@ -31,6 +33,7 @@ plugin.install = function( Vue, options = {} ){
     }
     // 在Vue原型实现toast的DOM挂在、功能
     // 用户可以通过在Vue实例通过this.$toast来访问
+    // option 单个的配置项
     Vue.prototype.$toast = ( option = {} ) => {
         let body = document.body || document.getElementsByTagName('body')[0],
             instance = new ToastController().$mount( document.createElement('div') );
