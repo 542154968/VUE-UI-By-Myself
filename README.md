@@ -1,6 +1,3 @@
-# VUE-UI-By-Myself
-> 工作中或者自己没事写的一些基础UI组件 一般功能都偏向定制和简单化的 扩展不多
-
 # Toast
 ![Toast效果图](https://github.com/542154968/VUE-UI-By-Myself/blob/master/toast/%E6%95%88%E6%9E%9C%E5%9B%BE%E7%89%87.jpg)
 - 暂时只支持上方的固定title提示 
