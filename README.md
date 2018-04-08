@@ -29,8 +29,5 @@ export default {
 # showImgWithRadius
 > 模仿QQ空间移动客户端的随着屏幕滚动图片呈现半圆形展现的效果 用`range`模仿窗口滚动
 
-- ![变化效果1](https://github.com/542154968/Vue-UI/blob/master/showImgWithRadius/demoImg/1.jpg)
 - ![变化效果2](https://github.com/542154968/Vue-UI/blob/master/showImgWithRadius/demoImg/2.jpg)
 - ![变化效果3](https://github.com/542154968/Vue-UI/blob/master/showImgWithRadius/demoImg/3.jpg)
-- ![变化效果4](https://github.com/542154968/Vue-UI/blob/master/showImgWithRadius/demoImg/4.jpg)
-- ![变化效果5](https://github.com/542154968/Vue-UI/blob/master/showImgWithRadius/demoImg/5.jpg)
