@@ -13,9 +13,20 @@ let Message = function (options) {
   const $msg = Vue.extend(Msg)
   // 实例化并挂载
   const instance = new $msg().$mount(document.createElement('div'))
+  instance._remove = function() {
+    document.body.removeChild(instance.$el);
+  };
   // 传入参数 props
   instance.msg = options.msg
   instance.type = options.type
+  instance.cancel = function() {
+        typeof options.cancel === 'function' && options.cancel();
+        instance._remove();
+    };
+    instance.confirm = function() {
+        typeof options.confirm === 'function' && options.confirm();
+        instance._remove();
+    };
   // 添加到dom中
   document.body.appendChild(instance.$el)
 }
