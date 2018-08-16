@@ -30,5 +30,7 @@ let Message = function (options) {
   // 添加到dom中
   document.body.appendChild(instance.$el)
 }
+// 加上这个可以直接在vue全局调用 
+Vue.prototype.$Message = Message;
 
 export default Message
