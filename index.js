@@ -50,7 +50,7 @@ let Message = function (options) {
   // 添加到dom中
   document.body.appendChild(instance.$el)
 }
-// 加上这个可以直接在vue全局调用  感觉这还不是最好的方式  如何 vue.use()也可以用  直接Message()也可以用呢
+// 加上这个可以直接在vue全局调用  element的源码也是这种方式注册的哦！
 Vue.prototype.$Message = Message;
 
 export default Message
