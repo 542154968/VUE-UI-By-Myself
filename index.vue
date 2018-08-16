@@ -1,6 +1,8 @@
 <template>
   <div :class="type">
-    {{msg}}
+    <p>{{msg}}<p>
+    <button @click="cancel">取消</button>
+    <button @click="confirm">确定</button>
   </div>
 </template>
 
@@ -21,7 +23,13 @@ export default {
   },
   data () {
     return {}
-  }
+  },
+  methods: {
+        cancel() {
+        },
+        confirm() {
+        }
+    }
 }
 </script>
 
