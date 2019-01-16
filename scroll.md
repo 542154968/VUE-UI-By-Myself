@@ -11,7 +11,8 @@
                 v-for="(v, k) in dataList"
                 :key="k">
                 <li v-for="(item , index) in v"
-                    :key="`${item}${index}`">{{item}}</li>
+                    :key="`${item}${index}`"
+                    :style="{height: liHeight}">{{item}}</li>
             </ul>
         </div>
     </div>
@@ -24,14 +25,19 @@ export default {
             default: '40px',
             type: String
         },
+        liHeight: {
+            default: '20px',
+            type: String
+        },
         datas: {
             default () {
-                return []
-            }
+                return [1, 2]
+            },
+            type: Array
         }
     },
     mounted () {
-        this.startScroll()
+        this.setData()
     },
     beforeDestroy () {
         this.stopMove()
@@ -46,16 +52,29 @@ export default {
             curScroll: 0,
             // 滚动速率
             speed: 0.5,
-			// 数据
-            dataList: [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
+            dataList: []
         }
     },
     methods: {
+        // 可能在li的高度被撑开的时候 这个计算有问题  比如 li的高度大于设置的 20  受盒模型影响
+        setData () {
+            // 如果li的高度 大于 滚动区域的高度 那么就滚动
+            const curHeight = this.datas.length * this.getNum(this.liHeight)
+            this.dataList = new Array(curHeight > this.getNum(this.height) ? 2 : 1).fill(this.datas)
+            this.startScroll()
+        },
+        getNum (str) {
+            return Number(str.replace(/[a-zA-Z]+/, ''))
+        },
         startScroll () {
-            this.$nextTick().then(() => {
-                this.getUlHeight()
-                this.handleMove()
-            })
+            if (this.dataList.length > 1) {
+                this.$nextTick().then(() => {
+                    this.getUlHeight()
+                    this.handleMove()
+                })
+            } else {
+                this.stopMove()
+            }
         },
         getUlHeight () {
             this.ulHeight = this.$refs.ul[0].offsetHeight
@@ -92,5 +111,6 @@ export default {
     }
 }
 </style>
+
 
 ```
