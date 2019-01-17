@@ -1,18 +1,18 @@
 # vue无缝滚动
+> 源码
+
 ```vue
 <template>
     <div class="wrap"
-        :style="{height}">
+        :style="{height}"
+        @mouseenter="stopMove"
+        @mouseleave="handleMove">
         <div class="wrap-contain"
             ref="wrap">
             <ul ref="ul"
-                @mouseenter="stopMove"
-                @mouseleave="handleMove"
-                v-for="(v, k) in dataList"
-                :key="k">
-                <li v-for="(item , index) in v"
-                    :key="`${item}${index}`"
-                    :style="{height: liHeight}">{{item}}</li>
+                v-for="(item, i) in dataList"
+                :key="i">
+                <slot :data="item"></slot>
             </ul>
         </div>
     </div>
@@ -25,13 +25,14 @@ export default {
             default: '40px',
             type: String
         },
-        liHeight: {
+        itemHeight: {
             default: '20px',
-            type: String
+            type: String,
+            requir: true
         },
         datas: {
             default () {
-                return [1, 2]
+                return ['李乾坤', '王宇', '夏海洋', '曾丽', '张厚奇', '牛朋朋', '程帧', '排名不分先后', '李乾坤', '王宇', '夏海洋', '曾丽', '张厚奇', '牛朋朋', '程帧', '排名不分先后', '李乾坤', '王宇', '夏海洋', '曾丽', '张厚奇', '牛朋朋', '程帧', '排名不分先后']
             },
             type: Array
         }
@@ -59,7 +60,7 @@ export default {
         // 可能在li的高度被撑开的时候 这个计算有问题  比如 li的高度大于设置的 20  受盒模型影响
         setData () {
             // 如果li的高度 大于 滚动区域的高度 那么就滚动
-            const curHeight = this.datas.length * this.getNum(this.liHeight)
+            const curHeight = this.datas.length * this.getNum(this.itemHeight)
             this.dataList = new Array(curHeight > this.getNum(this.height) ? 2 : 1).fill(this.datas)
             this.startScroll()
         },
@@ -96,21 +97,23 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.wrap {
-    background: #fff;
-    overflow: hidden;
-}
-.wrap-contain {
-    ul {
-        overflow: hidden;
-        li {
-            height: 20px;
-            line-height: 20px;
-        }
-    }
-}
+<style lang="scss" >
 </style>
 
 
 ```
+
+> 调用方式
+
+```vue
+<template>
+    <div class="terminal"
+        <VerticalScroll height="256px"
+            itemHeight="40px">
+            <template slot-scope="datas">
+                <li v-for="(item , index) in datas.data"
+                    :key="`${item}${index}`">{{item}}</li>
+            </template>
+        </VerticalScroll>
+    </div>
+</template>
