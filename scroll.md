@@ -1,6 +1,7 @@
 # vue无缝滚动
 > 源码
 
+```vue
 <template>
     <div class="wrap"
         :style="{height}"
@@ -140,7 +141,7 @@ export default {
 
 <style lang="scss" >
 </style>
-
+```
 
 > 调用方式
 
