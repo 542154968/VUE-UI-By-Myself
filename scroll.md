@@ -75,9 +75,12 @@ export default {
     },
     methods: {
         handleWheel (e) {
+            if (this.dataList.length <= 1) {
+                return
+            }
             this.curScroll = e.wheelDelta > 0 ? this.curScroll - 10 : this.curScroll + 10
             if (-this.curScroll >= 0) {
-                this.curScroll = 0
+                this.curScroll = this.ulHeight
             }
             this.handelScroll()
         },
@@ -103,17 +106,6 @@ export default {
                 this.stopMove()
             }
         },
-        addDocumentEvent () {
-            document.addEventListener('mousewheel', this.stopWheel)
-            document.addEventListener('DOMMouseScroll', this.stopWheel)
-        },
-        removeDocumentEvent () {
-            document.removeEventListener('mousewheel', this.stopWheel)
-            document.removeEventListener('DOMMouseScroll', this.stopWheel)
-        },
-        stopWheel (event) {
-            event.preventDefault()
-        },
         getUlHeight () {
             this.ulHeight = this.$refs.ul[0].offsetHeight
         },
@@ -123,7 +115,7 @@ export default {
             this.handelScroll()
         },
         handelScroll () {
-            if (this.curScroll >= this.ulHeight) {
+            if (this.curScroll > this.ulHeight) {
                 this.$refs.wrap.style.transform = `translate3d(0, 0, 0)`
                 this.curScroll = 0
             } else {
@@ -134,6 +126,17 @@ export default {
         stopMove (type) {
             this.dataList.length > 1 && type === 'mouseenter' && this.addDocumentEvent()
             cancelAnimationFrame(this.timeId)
+        },
+        addDocumentEvent () {
+            document.addEventListener('mousewheel', this.stopWheel)
+            document.addEventListener('DOMMouseScroll', this.stopWheel)
+        },
+        removeDocumentEvent () {
+            document.removeEventListener('mousewheel', this.stopWheel)
+            document.removeEventListener('DOMMouseScroll', this.stopWheel)
+        },
+        stopWheel (event) {
+            event.preventDefault()
         }
     }
 }
@@ -141,6 +144,7 @@ export default {
 
 <style lang="scss" >
 </style>
+
 ```
 
 > 调用方式
