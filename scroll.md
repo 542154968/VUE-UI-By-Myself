@@ -45,6 +45,11 @@ export default {
             default: 0.5,
             type: Number
         },
+        // 鼠标滚动系数 越大 滚动越快
+        mouseScrollSpeed: {
+            default: 10,
+            type: Number
+        },
         // 这个随便false true  用来数据改变后 重新初始化组件
         resetScroll: {
             default: false,
@@ -56,6 +61,7 @@ export default {
     },
     beforeDestroy () {
         this.stopMove()
+        this.removeDocumentEvent()
     },
     watch: {
         resetScroll () {
@@ -78,7 +84,7 @@ export default {
             if (this.dataList.length <= 1) {
                 return
             }
-            this.curScroll = e.wheelDelta > 0 ? this.curScroll - 10 : this.curScroll + 10
+            this.curScroll = e.wheelDelta > 0 ? this.curScroll - this.mouseScrollSpeed : this.curScroll + this.mouseScrollSpeed
             if (-this.curScroll >= 0) {
                 this.curScroll = this.ulHeight
             }
@@ -144,6 +150,7 @@ export default {
 
 <style lang="scss" >
 </style>
+
 
 ```
 
