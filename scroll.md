@@ -184,7 +184,17 @@ export default {
 </template>
 
 <script>
-export default{
+export default {
+    data () {
+        return {
+            resetScroll: false,
+            pageLoading: false,
+            dataList: []
+        }
+    },
+    created () {
+        this.loadData()
+    },
     methods: {
         loadData (type = 'renew') {
             this.pageLoading = true
