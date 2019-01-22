@@ -93,6 +93,8 @@ export default {
         // 可能在li的高度被撑开的时候 这个计算有问题  比如 li的高度大于设置的 20  受盒模型影响
         setData () {
             this.stopMove()
+            this.$refs.wrap.style.transform = `translate3d(0, 0, 0)`
+            this.curScroll = 0
             // 如果li的高度 大于 滚动区域的高度 那么就滚动
             const curHeight = this.datas.length * this.getNum(this.itemHeight)
             this.ulHeight = curHeight
@@ -104,6 +106,7 @@ export default {
         },
         startScroll (type) {
             this.removeDocumentEvent()
+
             if (this.dataList.length > 1) {
                 this.$nextTick().then(() => {
                     this.handleMove()
@@ -149,8 +152,12 @@ export default {
 </script>
 
 <style lang="scss" >
+.wrap {
+    .wrap-contain {
+        backface-visibility: hidden;
+    }
+}
 </style>
-
 
 ```
 
@@ -159,12 +166,40 @@ export default {
 ```vue
 <template>
     <div class="terminal"
-        <VerticalScroll height="256px"
-            itemHeight="40px">
-            <template slot-scope="datas">
-                <li v-for="(item , index) in datas.data"
-                    :key="`${item}${index}`">{{item}}</li>
-            </template>
-        </VerticalScroll>
+        <VerticalScroll :datas="dataList"
+                :resetScroll="resetScroll"
+                height="186px"
+                itemHeight="30px"
+                v-loading="pageLoading">
+                <template slot-scope="datas">
+                    <li class="tabs"
+                        v-for="(item) in datas.data"
+                        :key="item.id">
+                        <span>{{item.date}}</span>
+                        <span>{{item.count}}</span>
+                        <span>{{item.percent}}</span></li>
+                </template>
+            </VerticalScroll>
     </div>
 </template>
+
+<script>
+export default{
+    methods: {
+        loadData (type = 'renew') {
+            this.pageLoading = true
+            getTerminal({
+                type
+            }).then(res => {
+                this.pageLoading = false
+                res = res.data
+                this.dataList = Array.isArray(res.contentList) ? res.contentList : []
+                // 初始化该组件
+                this.resetScroll = !this.resetScroll
+            }).catch(() => {
+                this.pageLoading = false
+            })
+        },
+    }
+}
+</script>
