@@ -47,7 +47,7 @@ export default {
         },
         // 鼠标滚动系数 越大 滚动越快
         mouseScrollSpeed: {
-            default: 15,
+            default: 8,
             type: Number
         },
         // 这个随便false true  用来数据改变后 重新初始化组件
@@ -91,7 +91,8 @@ export default {
             this.handleWheelMove()
         },
         handleWheelMove () {
-            requestAnimationFrame(this.handelScroll)
+            cancelAnimationFrame(this.timeId)
+            this.timeId = requestAnimationFrame(this.handelScroll)
         },
         // 可能在li的高度被撑开的时候 这个计算有问题  比如 li的高度大于设置的 20  受盒模型影响
         setData () {
@@ -122,6 +123,7 @@ export default {
             this.ulHeight = this.$refs.ul[0].offsetHeight
         },
         handleMove () {
+            cancelAnimationFrame(this.timeId)
             this.timeId = requestAnimationFrame(this.handleMove)
             this.curScroll = this.curScroll + this.speed
             this.handelScroll()
