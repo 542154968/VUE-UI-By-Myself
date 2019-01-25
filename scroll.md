@@ -5,6 +5,7 @@
 <template>
     <div class="wrap"
         :style="{height}"
+        ref="wrapContain"
         @mouseenter="stopMove('mouseenter')"
         @mouseleave="startScroll('mouseenter')"
         @wheel="handleWheel">
@@ -50,6 +51,16 @@ export default {
             default: 8,
             type: Number
         },
+        // 是否间隔滚动 每几秒翻滚一次
+        intervalScroll: {
+            default: false,
+            type: Boolean
+        },
+        // 间隔滚动时间
+        intervalTime: {
+            default: 5000,
+            type: Number
+        },
         // 这个随便false true  用来数据改变后 重新初始化组件
         resetScroll: {
             default: false,
@@ -57,11 +68,12 @@ export default {
         }
     },
     mounted () {
-        this.setData()
+        // this.setData()
     },
     beforeDestroy () {
         this.stopMove()
         this.removeDocumentEvent()
+        cancelAnimationFrame(this.intervalAnimatTimeId)
     },
     watch: {
         resetScroll () {
@@ -72,55 +84,148 @@ export default {
         return {
             // 每次滚动时间Id
             timeId: null,
+            //
+            intervalAnimatTimeId: null,
+            // 间隔滚动时间
+            intervalTimeId: null,
             // ul的高度
             ulHeight: 0,
             // 当前滚动距离
             curScroll: 0,
-            dataList: []
+            // 间隔滚动 下次要滚动的距离
+            targetScroll: 0,
+            dataList: [],
+            // 是否正在滚动  避免鼠标重复触发滚动 在滚动没完成时再触发会乱掉 滚动距离
+            scrollStaus: false,
+            activeIndex: 0
         }
     },
     methods: {
+        // 鼠标滚动的时候
         handleWheel (e) {
             if (this.dataList.length <= 1) {
                 return
             }
-            this.curScroll = e.wheelDelta > 0 ? this.curScroll - this.mouseScrollSpeed : this.curScroll + this.mouseScrollSpeed
-            if (-this.curScroll >= 0) {
-                this.curScroll = this.ulHeight
+            if (this.intervalScroll) {
+                this.intervalMouseMove(e)
+            } else {
+                this.curScroll = e.deltaY < 0 ? this.curScroll - this.mouseScrollSpeed : this.curScroll + this.mouseScrollSpeed
+                if (-this.curScroll >= 0) {
+                    this.curScroll = this.ulHeight
+                }
+                this.handleWheelMove()
             }
-            this.handleWheelMove()
         },
+        intervalMouseMove (e) {
+            if (this.scrollStaus === true) {
+                return
+            }
+            // this.intervalMoveFun(e.deltaY < 0 ? 'down' : 'up')
+            if (e.deltaY > 0) {
+                // 向下滚动
+                this.intervalMoveDownFun()
+            } else {
+                // 向上滚动
+                // this.intervalMoveUpFun()
+            }
+        },
+        // 鼠标滚动
         handleWheelMove () {
             cancelAnimationFrame(this.timeId)
             this.timeId = requestAnimationFrame(this.handelScroll)
         },
         // 可能在li的高度被撑开的时候 这个计算有问题  比如 li的高度大于设置的 20  受盒模型影响
         setData () {
+            const itemHeight = this.getNum(this.itemHeight)
             this.stopMove()
-            this.$refs.wrap.style.transform = `translate3d(0, 0, 0)`
+            this.$refs.wrapContain.style.transform = `translate3d(0, 0, 0)`
             this.curScroll = 0
             // 如果li的高度 大于 滚动区域的高度 那么就滚动
-            const curHeight = this.datas.length * this.getNum(this.itemHeight)
+            const curHeight = this.datas.length * itemHeight
             this.ulHeight = curHeight
             this.dataList = new Array(curHeight > this.getNum(this.height) ? 2 : 1).fill(this.datas)
             this.startScroll()
         },
+        // 序列成数字
         getNum (str) {
             return Number(str.replace(/[a-zA-Z]+/, ''))
         },
+        // 开始滚动
         startScroll (type) {
             this.removeDocumentEvent()
-
             if (this.dataList.length > 1) {
                 this.$nextTick().then(() => {
-                    this.handleMove()
+                    this.intervalScroll ? this.intervalMove() : this.handleMove()
                 })
             } else {
                 this.stopMove()
             }
         },
-        getUlHeight () {
-            this.ulHeight = this.$refs.ul[0].offsetHeight
+        // 每次滚动 50px 等待3s
+        intervalMove () {
+            this.intervalTimeId = setInterval(() => {
+                this.intervalMoveDownFun()
+            }, this.intervalTime)
+        },
+        intervalMoveFun (type) {
+            const itemHeight = this.getNum(this.itemHeight)
+            this.targetScroll = type === 'up' ? this.curScroll - itemHeight : this.curScroll + itemHeight
+            if (Math.abs(this.targetScroll) > Math.abs(this.ulHeight)) {
+                this.$refs.wrapContain.style.transform = `translate3d(0, 0, 0)`
+                this.curScroll = 0
+                this.targetScroll = this.curScroll - itemHeight
+            }
+            this.scrollStaus = true
+            type === 'up' ? this.handleIntervalUpMove() : this.handleIntervalMove()
+        },
+        intervalMoveUpFun () {
+            const itemHeight = this.getNum(this.itemHeight)
+            this.targetScroll = this.curScroll - itemHeight
+            if (Math.abs(this.targetScroll) > Math.abs(this.ulHeight)) {
+                this.$refs.wrapContain.style.transform = `translate3d(0, 0, 0)`
+                this.curScroll = 0
+                this.targetScroll = this.curScroll - itemHeight
+            }
+            this.scrollStaus = true
+            this.handleIntervalUpMove()
+        },
+        intervalMoveDownFun () {
+            const itemHeight = this.getNum(this.itemHeight)
+            this.activeIndex++
+            this.targetScroll = itemHeight * this.activeIndex
+            // 如果下次目标滚动距离 大于 最大可滚动距离的话
+            if (this.targetScroll > this.ulHeight) {
+                this.$refs.wrapContain.style.transform = `translate3d(0, 0, 0)`
+                this.curScroll = 0
+                this.activeIndex = 1
+                this.targetScroll = itemHeight * this.activeIndex
+            }
+            this.scrollStaus = true
+            this.handleIntervalMove()
+        },
+        handleIntervalUpMove () {
+            cancelAnimationFrame(this.timeId)
+            this.timeId = requestAnimationFrame(this.handleIntervalUpMove)
+            this.curScroll = this.curScroll - this.speed
+            if (this.curScroll <= this.targetScroll) {
+                this.curScroll = this.targetScroll
+                cancelAnimationFrame(this.timeId)
+                this.scrollStaus = false
+            }
+
+            this.$refs.wrapContain.style.transform = `translate3d(0, ${this.curScroll}px, 0)`
+        },
+
+        handleIntervalMove () {
+            cancelAnimationFrame(this.timeId)
+            this.intervalAnimatTimeId = requestAnimationFrame(this.handleIntervalMove)
+            this.curScroll = this.curScroll + this.speed
+            if (this.curScroll >= this.targetScroll) {
+                this.curScroll = this.targetScroll
+                cancelAnimationFrame(this.intervalAnimatTimeId)
+                this.scrollStaus = false
+            }
+            this.handelScroll()
         },
         handleMove () {
             cancelAnimationFrame(this.timeId)
@@ -130,16 +235,20 @@ export default {
         },
         handelScroll () {
             if (this.curScroll > this.ulHeight) {
-                this.$refs.wrap.style.transform = `translate3d(0, 0, 0)`
+                // this.$refs.wrap.style.transform = `translate3d(0, 0, 0)`
+                this.$refs.wrapContain.scrollTo(0, 0)
                 this.curScroll = 0
             } else {
-                this.$refs.wrap.style.transform = `translate3d(0, -${this.curScroll}px, 0)`
+                // this.$refs.wrap.style.transform = `translate3d(0, -${this.curScroll}px, 0)`
+
+                this.$refs.wrapContain.scrollTo(0, this.curScroll)
             }
         },
         // s鼠标进入
         stopMove (type) {
             this.dataList.length > 1 && type === 'mouseenter' && this.addDocumentEvent()
             cancelAnimationFrame(this.timeId)
+            this.intervalScroll && clearInterval(this.intervalTimeId)
         },
         addDocumentEvent () {
             document.addEventListener('mousewheel', this.stopWheel)
@@ -158,7 +267,9 @@ export default {
 
 <style lang="scss" >
 .wrap {
+    transform-style: preserve-3d;
     .wrap-contain {
+        perspective: 1000;
         backface-visibility: hidden;
     }
 }
