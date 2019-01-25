@@ -236,7 +236,9 @@ export default {
         handelScroll () {
             if (this.curScroll > this.ulHeight) {
                 // this.$refs.wrap.style.transform = `translate3d(0, 0, 0)`
-                this.$refs.wrapContain.scrollTo(0, 0)
+                // 计算一下偏差 避免 轻微抖动
+                const Max = this.curScroll - this.ulHeight
+                this.$refs.wrapContain.scrollTo(0, Max)
                 this.curScroll = 0
             } else {
                 // this.$refs.wrap.style.transform = `translate3d(0, -${this.curScroll}px, 0)`
