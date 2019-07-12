@@ -272,13 +272,23 @@ export default {
       cancelAnimationFrame(this.timeId);
       this.intervalScroll && clearInterval(this.intervalTimeId);
     },
-    addDocumentEvent() {
+     addDocumentEvent() {
       document.addEventListener("mousewheel", this.stopWheel);
       document.addEventListener("DOMMouseScroll", this.stopWheel);
+      const $el = this.$refs.wrap;
+      if ($el) {
+        $el.addEventListener("mousewheel", this.stopWheel);
+        $el.addEventListener("DOMMouseScroll", this.stopWheel);
+      }
     },
     removeDocumentEvent() {
       document.removeEventListener("mousewheel", this.stopWheel);
       document.removeEventListener("DOMMouseScroll", this.stopWheel);
+      const $el = this.$refs.wrap;
+      if ($el) {
+        $el.removeEventListener("mousewheel", this.stopWheel);
+        $el.removeEventListener("DOMMouseScroll", this.stopWheel);
+      }
     },
     stopWheel(event) {
       event.preventDefault();
