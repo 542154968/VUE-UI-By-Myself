@@ -32,10 +32,10 @@
         :style="{ left: offsetLeft + '%' }"
         @mousedown="handleMouseDown"
         @mouseup="handleMouseUp"
+        ref="sliderBtn"
       >
         <div
           :class="['el-tooltip el-slider__button', { dragging: isMoveing }]"
-          ref="sliderBtn"
         ></div>
       </div>
     </div>
@@ -95,13 +95,16 @@ export default {
     handleMouseDown(event) {
       // 先计算出点击的位置 相当于left多少
       // 计算出偏移位置  点击位置 - btn的left
+      // 为啥取的不是指的的btn那个结构而是他的父元素 因为btn那个带动画 计算会有偏差 父元素一直是36 不会有偏差
+
+      this.isMoveing = true;
       const $parent = this.$refs.contain;
       const $parentBounding = $parent.getBoundingClientRect();
       const $btn = this.$refs.sliderBtn;
       this.offsetX = event.clientX - $btn.getBoundingClientRect().left;
       this.parentX = $parentBounding.left;
       this.containWidth = $parentBounding.width;
-      this.isMoveing = true;
+
       this.addEvent();
     },
     handleMouseUp() {
@@ -118,9 +121,9 @@ export default {
     },
     handleMove(event) {
       const { clientX } = event;
-      // 为啥这里多了个8  因为按钮是16  偏移到最开始最左边并不在轴最左边 中间位置是16 / 2 就是偏移8
+      // 为啥这里多了个18  按钮结构到最边缘位置不是正好是0 按钮结构的中心对着最边缘位置 所以要除以2算出这一部分的偏移量
       let left = (
-        ((clientX - this.parentX - this.offsetX + 8) / this.containWidth) *
+        ((clientX - this.parentX - this.offsetX + 18) / this.containWidth) *
         100
       ).toFixed(6);
       if (left >= 100) {
@@ -176,7 +179,7 @@ export default {
 };
 </script>
 <style lang="scss">
-
+#cesiumContainer {
   .el-slider.split {
     .el-slider__button-wrapper {
       left: 50%;
@@ -194,9 +197,8 @@ export default {
       }
     }
   }
-
+}
 </style>
-
 ```
 
 #### 使用方式
