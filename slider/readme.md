@@ -181,11 +181,6 @@ export default {
     .el-slider__button-wrapper {
       left: 50%;
     }
-    .el-slider__button:hover,
-    .el-slider__button.hover,
-    .el-slider__button.dragging {
-      transform: none;
-    }
     .el-slider__bar {
       &.left {
         border-radius: 3px 0 0 3px;
