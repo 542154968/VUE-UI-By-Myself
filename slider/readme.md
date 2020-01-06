@@ -2,8 +2,8 @@
 
 ## 效果图
 
-- ![效果1](https://github.com/542154968/Vue-UI/blob/master/slider/images/eg-1.jpg)
-- ![效果2](https://github.com/542154968/Vue-UI/blob/master/slider/images/eg-2.jpg)
+- ![效果1](https://github.com/542154968/Vue-UI/blob/master/slider/images/eg-1.png)
+- ![效果2](https://github.com/542154968/Vue-UI/blob/master/slider/images/eg-2.png)
 
 ### 实现代码
 
